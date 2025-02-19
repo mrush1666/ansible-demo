@@ -1,0 +1,71 @@
+---
+- hosts: target_tool_server
+  tasks:
+    - name: Update all packages
+      become: yes
+      become_user: root
+      package:
+        name: '*' 
+        state: latest
+      register: update_reg
+
+    - name: Reboot
+      become: yes
+      become_user: root
+      reboot:
+      when: update_reg.changed | default(false)
+
+    - name: Install git
+      become: yes
+      become_user: root
+      package:
+        name: 'git'
+        state: present
+      register: install_git
+      
+    - name: Check python version
+      command:  git --version
+      register: git_ver
+
+    - name: Display git version
+      debug: 
+        var: git_ver.stdout_lines 
+
+    - name: Reboot
+      become: yes
+      become_user: root
+      reboot:
+      when: install_git.changed | default(false)
+
+    - name: Install python3
+      become: yes
+      become_user: root
+      package:
+        name: 'python3-pip'
+        state: present
+      register: install_python
+
+    - name: Reboot
+      become: yes
+      become_user: root
+      reboot:
+      when: install_python.changed | default(false)
+     
+    - name: Check python version
+      command:  rpm -qa | grep -i python3-pip
+      register: python_ver 
+
+    - name: Display python version
+      debug: 
+        var: python_ver.stdout_lines
+
+    - name: Install Ansible
+      command:  sudo pip3 install ansible  
+      
+    - name: Check ansible version
+      command:  ansible --version
+      register: ansible_ver 
+
+    - name: Display ansible version
+      debug: 
+        var: ansible_ver.stdout_lines

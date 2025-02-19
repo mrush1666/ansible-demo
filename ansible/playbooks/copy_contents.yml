@@ -1,0 +1,19 @@
+---
+- hosts: target_tool_server
+  vars: 
+    dir_path: /code2/Mrunal/Fiyush/ansible #path of source file
+    target_ip: 10.0.3.24 #ip of target server
+  tasks:
+    - name: copy contents to target server
+      copy: 
+        src: "{{ dir_path }}"
+        dest: "/home/user"
+        
+    - name: file permission
+      become: true
+      become_user: root
+      file:
+        path: /home/user/ansible
+        state: directory
+        mode: 0664
+        recurse: yes

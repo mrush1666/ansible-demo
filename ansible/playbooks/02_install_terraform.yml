@@ -1,0 +1,23 @@
+---
+- hosts: target_tool_server
+  tasks:
+    - name: Get hashicorp repository
+      get_url: 
+        url: https://releases.hashicorp.com/terraform/1.1.2/terraform_1.1.2_linux_amd64.zip
+        dest: /home/user
+
+    - name: Unarchive the download
+      become: yes
+      become_user: root
+      unarchive:
+        src: /home/user/terraform_1.1.2_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        
+    - name: Check terraform version
+      command:  terraform --version
+      register: tf_ver
+
+    - name: Display git version
+      debug: 
+        var: tf_ver.stdout_lines 
